@@ -1,15 +1,15 @@
 const express = require('express');
 
+// Route files
+const authRoutes = require('./routes/auth');
+
 const app = express();
 
 // Body parser
 app.use(express.json());
 
-app.get('/api/signup', (req, res) => {
-  res.json({
-    data: 'You hit signup endpoint',
-  });
-});
+// Mount routes
+app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 5000;
 
