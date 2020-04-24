@@ -1,4 +1,16 @@
 const express = require('express');
+const morgan = require('morgan');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+
+const connectDB = require('./config/db');
+
+// Load environment variables
+dotenv.config({ path: './config/config.env' });
+
+// Connect to database
+connectDB();
 
 // Route files
 const authRoutes = require('./routes/auth');
@@ -8,11 +20,19 @@ const app = express();
 // Body parser
 app.use(express.json());
 
+// Logging middleware in development
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+// Enable CORS
+app.use(cors());
+
 // Mount routes
 app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on Port ${PORT}`);
+  console.log(`Server running in ${process.env.NODE_ENV} mode on Port ${PORT}`);
 });
