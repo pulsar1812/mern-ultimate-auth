@@ -12,6 +12,7 @@ exports.signup = async (req, res) => {
   try {
     let user = await User.findOne({ email });
 
+    // Check if user already exists
     if (user) {
       return res.status(400).json({ error: 'Email is taken.' });
     }
@@ -60,7 +61,7 @@ exports.accountActivation = async (req, res) => {
 
   // Make sure token exists
   if (!token) {
-    return res.status(401).json({ message: '' });
+    return res.status(401).json({ error: 'There is no activation token.' });
   }
 
   try {
@@ -87,4 +88,35 @@ exports.accountActivation = async (req, res) => {
 // @desc    Signing in user
 // @route   POST /api/auth/signin
 // @access  Public
-exports.signin = async (req, res) => {};
+exports.signin = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if user exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ error: 'User does not exist.' });
+    }
+
+    // Check if authenticated
+    if (!user.authenticate(password)) {
+      return res.status(400).json({
+        error: 'Email and password do not match',
+      });
+    }
+
+    // Generate token and send to client
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: 360000,
+    });
+
+    res.json({
+      token,
+      user,
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+};
