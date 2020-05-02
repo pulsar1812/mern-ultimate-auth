@@ -1,17 +1,30 @@
 import React, { Fragment } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
-const Layout = ({ children }) => {
-  const nav = (
+const Layout = ({ children, match, history }) => {
+  const isActive = (path) => {
+    if (history.location.pathname === path) {
+      return { color: '#000' };
+    } else {
+      return { color: '#fff' };
+    }
+  };
+
+  const nav = () => (
     <ul className='nav nav-tabs bg-primary'>
       <li className='nav-item'>
-        <Link to='/' className='text-light nav-link'>
-          Home
+        <Link to='/' className='nav-link' style={isActive('/')}>
+          Home / {JSON.stringify(match)}
         </Link>
       </li>
       <li className='nav-item'>
-        <Link to='/signup' className='text-light nav-link'>
-          Signup
+        <Link to='/signin' className='nav-link' style={isActive('/signin')}>
+          Sign In
+        </Link>
+      </li>
+      <li className='nav-item'>
+        <Link to='/signup' className='nav-link' style={isActive('/signup')}>
+          Sign Up
         </Link>
       </li>
     </ul>
@@ -19,10 +32,10 @@ const Layout = ({ children }) => {
 
   return (
     <Fragment>
-      {nav}
+      {nav()}
       <div className='container'>{children}</div>
     </Fragment>
   );
 };
 
-export default Layout;
+export default withRouter(Layout);

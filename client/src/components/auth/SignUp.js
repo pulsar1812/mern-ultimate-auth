@@ -21,8 +21,20 @@ const SignUp = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const body = JSON.stringify({ name, email, password });
+
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API}/signup`);
+      const response = await axios.post(
+        `${process.env.REACT_APP_API}/auth/signup`,
+        body,
+        config
+      );
 
       console.log('Signup Success', response);
       setFormData({
@@ -46,6 +58,7 @@ const SignUp = () => {
         <label className='text-muted'>Name</label>
         <input
           type='text'
+          name='name'
           value={name}
           className='form-control'
           onChange={handleChange}
@@ -56,6 +69,7 @@ const SignUp = () => {
         <label className='text-muted'>Email</label>
         <input
           type='email'
+          name='email'
           value={email}
           className='form-control'
           onChange={handleChange}
@@ -66,6 +80,7 @@ const SignUp = () => {
         <label className='text-muted'>Password</label>
         <input
           type='password'
+          name='password'
           value={password}
           className='form-control'
           onChange={handleChange}
