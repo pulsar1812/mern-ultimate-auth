@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 
-const Layout = ({ children, match, history }) => {
+import { isAuth, signOut } from './auth/helpers';
+
+const Layout = ({ children, history }) => {
   const isActive = (path) => {
     if (history.location.pathname === path) {
       return { color: '#000' };
@@ -14,19 +16,60 @@ const Layout = ({ children, match, history }) => {
     <ul className='nav nav-tabs bg-primary'>
       <li className='nav-item'>
         <Link to='/' className='nav-link' style={isActive('/')}>
-          Home / {JSON.stringify(match)}
+          Home
         </Link>
       </li>
-      <li className='nav-item'>
-        <Link to='/signin' className='nav-link' style={isActive('/signin')}>
-          Sign In
-        </Link>
-      </li>
-      <li className='nav-item'>
-        <Link to='/signup' className='nav-link' style={isActive('/signup')}>
-          Sign Up
-        </Link>
-      </li>
+
+      {!isAuth() && (
+        <Fragment>
+          <li className='nav-item'>
+            <Link to='/signin' className='nav-link' style={isActive('/signin')}>
+              Sign In
+            </Link>
+          </li>
+          <li className='nav-item'>
+            <Link to='/signup' className='nav-link' style={isActive('/signup')}>
+              Sign Up
+            </Link>
+          </li>
+        </Fragment>
+      )}
+
+      {isAuth() && isAuth().role === 'admin' && (
+        <li className='nav-item'>
+          <Link to='/admin' className='nav-link' style={isActive('/admin')}>
+            {isAuth().name}
+          </Link>
+        </li>
+      )}
+
+      {isAuth() && isAuth().role === 'subscriber' && (
+        <li className='nav-item'>
+          <Link
+            to='/dashboard'
+            className='nav-link'
+            style={isActive('/dashboard')}
+          >
+            {isAuth().name}
+          </Link>
+        </li>
+      )}
+
+      {isAuth() && (
+        <li className='nav-item'>
+          <span
+            className='nav-link'
+            style={{ cursor: 'pointer', color: '#fff' }}
+            onClick={() =>
+              signOut(() => {
+                history.push('/');
+              })
+            }
+          >
+            Sign Out
+          </span>
+        </li>
+      )}
     </ul>
   );
 

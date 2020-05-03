@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-const SignIn = () => {
+import { authenticate, isAuth } from './helpers';
+
+const SignIn = ({ history }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -36,13 +38,19 @@ const SignIn = () => {
       );
 
       console.log('Signin Success', response);
-      setFormData({
-        ...formData,
-        email: '',
-        password: '',
-        buttonText: 'Submitted',
+
+      authenticate(response, () => {
+        setFormData({
+          ...formData,
+          email: '',
+          password: '',
+          buttonText: 'Submitted',
+        });
+        // toast.success(`${response.data.user.name}, welcome back!`);
+        isAuth() && isAuth().role === 'admin'
+          ? history.push('/admin')
+          : history.push('/dashboard');
       });
-      toast.success(`${response.data.user.name}, welcome back!`);
     } catch (err) {
       console.log('Signin Error', err.response.data);
       setFormData({ ...formData, buttonText: 'Submit' });
@@ -85,6 +93,7 @@ const SignIn = () => {
   return (
     <div className='col-md-6 offset-md-3'>
       <ToastContainer />
+      {isAuth() ? <Redirect to='/dashboard' /> : null}
       <h1 className='p-5 text-center'>SignIn</h1>
       {signinForm()}
     </div>

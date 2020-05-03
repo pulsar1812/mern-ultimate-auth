@@ -13,6 +13,7 @@ connectDB();
 
 // Route files
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(cors());
 
 // Mount routes
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 
 const PORT = process.env.PORT || 5000;
 
