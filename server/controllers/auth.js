@@ -22,7 +22,7 @@ exports.signup = async (req, res) => {
     const token = jwt.sign(
       { name, email, password },
       process.env.JWT_ACCOUNT_ACTIVATION,
-      { expiresIn: 360000 } // 100 hours for testing purpose
+      { expiresIn: '3d' } // 3d for testing purpose
     );
 
     const emailData = {
@@ -108,7 +108,7 @@ exports.signin = async (req, res) => {
 
     // Generate token and send to client
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: 360000,
+      expiresIn: '1d',
     });
 
     res.json({
