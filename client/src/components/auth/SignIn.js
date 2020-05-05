@@ -28,12 +28,12 @@ const SignIn = ({ history }) => {
       },
     };
 
-    const body = JSON.stringify({ email, password });
+    const data = JSON.stringify({ email, password });
 
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API}/auth/signin`,
-        body,
+        data,
         config
       );
 

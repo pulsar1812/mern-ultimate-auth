@@ -6,6 +6,7 @@ const { requireSignin, adminMiddleware } = require('../middlewares/auth');
 const router = express.Router();
 
 router.get('/:id', requireSignin, getUser);
-router.put('/', requireSignin, adminMiddleware, updateUser);
+router.put('/update', requireSignin, updateUser);
+router.put('/admin/update', requireSignin, adminMiddleware, updateUser);
 
 module.exports = router;

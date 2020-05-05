@@ -29,12 +29,12 @@ const SignUp = () => {
       },
     };
 
-    const body = JSON.stringify({ name, email, password });
+    const data = JSON.stringify({ name, email, password });
 
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API}/auth/signup`,
-        body,
+        data,
         config
       );
 

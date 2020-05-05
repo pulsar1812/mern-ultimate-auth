@@ -33,12 +33,12 @@ const Activate = ({ match }) => {
       },
     };
 
-    const body = JSON.stringify({ token });
+    const data = JSON.stringify({ token });
 
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API}/auth/account-activation`,
-        body,
+        data,
         config
       );
 

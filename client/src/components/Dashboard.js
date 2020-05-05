@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-import { isAuth, getCookie, signOut } from './auth/helpers';
+import { isAuth, getCookie, signOut, updateUser } from './auth/helpers';
 
 const Dashboard = ({ history }) => {
   const [formData, setFormData] = useState({
@@ -30,13 +30,13 @@ const Dashboard = ({ history }) => {
     };
 
     try {
-      const response = await axios.get(url, config);
+      const res = await axios.get(url, config);
 
-      console.log('Profile Update', response);
-      const { role, name, email } = response.data;
+      console.log('Load Profile Success', res);
+      const { role, name, email } = res.data;
       setFormData({ ...formData, role, name, email });
     } catch (err) {
-      console.log('Profile Update Error', err.response.data.error);
+      console.log('Load Profile Error', err.response.data.error);
       if (err.response.status === 401) {
         signOut(() => {
           history.push('/');
@@ -56,31 +56,29 @@ const Dashboard = ({ history }) => {
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
     };
 
-    const body = JSON.stringify({ name, password });
+    const data = JSON.stringify({ name, password });
 
     try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_API}/user`,
-        body,
+      const res = await axios.put(
+        `${process.env.REACT_APP_API}/user/update`,
+        data,
         config
       );
 
-      console.log('Signup Success', response);
-      setFormData({
-        ...formData,
-        role: '',
-        name: '',
-        email: '',
-        password: '',
-        buttonText: 'Submitted',
+      console.log('Profile Update Success', res);
+      updateUser(res, () => {
+        setFormData({
+          ...formData,
+          buttonText: 'Submitted',
+        });
+        toast.success('Profile updated successfully');
       });
-      toast.success(response.data.message);
     } catch (err) {
-      console.log('Signup Error', err.response.data);
+      console.log('Profile Update Error', err.response.data.error);
       setFormData({ ...formData, buttonText: 'Submit' });
       toast.error(err.response.data.error);
     }

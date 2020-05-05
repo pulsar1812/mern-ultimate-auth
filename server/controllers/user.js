@@ -14,8 +14,8 @@ exports.getUser = async (req, res) => {
   }
 };
 
-// @desc    Get user by ID
-// @route   PUT /api/user
+// @desc    Update user
+// @route   PUT /api/user/update
 // @access  Private
 exports.updateUser = async (req, res) => {
   const { name, password } = req.body;
