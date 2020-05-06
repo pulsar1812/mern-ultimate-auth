@@ -54,13 +54,15 @@ const Dashboard = ({ history }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    setFormData({ ...formData, buttonText: 'Submitting' });
+
+    const data = JSON.stringify({ name, password });
+
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     };
-
-    const data = JSON.stringify({ name, password });
 
     try {
       const res = await axios.put(
@@ -104,7 +106,7 @@ const Dashboard = ({ history }) => {
           name='name'
           value={name}
           className='form-control'
-          onChange={handleChange}
+          onChange={(event) => handleChange(event)}
         />
       </div>
 

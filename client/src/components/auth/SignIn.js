@@ -22,24 +22,24 @@ const SignIn = ({ history }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    const data = JSON.stringify({ email, password });
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
       },
     };
 
-    const data = JSON.stringify({ email, password });
-
     try {
-      const response = await axios.post(
+      const res = await axios.post(
         `${process.env.REACT_APP_API}/auth/signin`,
         data,
         config
       );
 
-      console.log('Signin Success', response);
+      console.log('Signin Success', res);
 
-      authenticate(response, () => {
+      authenticate(res, () => {
         setFormData({
           ...formData,
           email: '',

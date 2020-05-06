@@ -23,22 +23,22 @@ const SignUp = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    const data = JSON.stringify({ name, email, password });
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
       },
     };
 
-    const data = JSON.stringify({ name, email, password });
-
     try {
-      const response = await axios.post(
+      const res = await axios.post(
         `${process.env.REACT_APP_API}/auth/signup`,
         data,
         config
       );
 
-      console.log('Signup Success', response);
+      console.log('Signup Success', res);
       setFormData({
         ...formData,
         name: '',
@@ -46,7 +46,7 @@ const SignUp = () => {
         password: '',
         buttonText: 'Submitted',
       });
-      toast.success(response.data.message);
+      toast.success(res.data.message);
     } catch (err) {
       console.log('Signup Error', err.response.data);
       setFormData({ ...formData, buttonText: 'Submit' });
