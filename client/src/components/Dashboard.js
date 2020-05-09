@@ -56,7 +56,7 @@ const Dashboard = ({ history }) => {
 
     setFormData({ ...formData, buttonText: 'Submitting' });
 
-    const data = JSON.stringify({ name, password });
+    const data = { name, password };
 
     const config = {
       headers: {
