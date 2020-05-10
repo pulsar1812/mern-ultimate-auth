@@ -41,7 +41,7 @@ exports.signup = async (req, res) => {
     const sent = await sendgridMail.send(emailData);
 
     if (!sent) {
-      return res.status(400).json({ message: 'Signup email sent error' });
+      return res.status(400).json({ error: 'Signup email sent error' });
     }
 
     res.json({
@@ -120,3 +120,56 @@ exports.signin = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
+// @desc    Forgot Password
+// @route   PUT /api/auth/forgot-password
+// @access  Public
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        error: 'User with that email does not exist',
+      });
+    }
+
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_RESET_PASSWORD, {
+      expiresIn: '10m',
+    });
+
+    const emailData = {
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: `Password Reset Link`,
+      html: `
+        <h1>Hi, we have received a request to reset your password. 
+        If you did not make the request, just ignore this email. Otherwise, 
+        you can reset your password using this link:</h1>
+        <p>${process.env.CLIENT_URL}/auth/password-reset/${token}</p>
+        <p>This email may contain sensitive information</p>
+        <p>${process.env.CLIENT_URL}</p>
+      `,
+    };
+
+    const sent = await sendgridMail.send(emailData);
+
+    if (!sent) {
+      return res.status(400).json({ error: 'Reset email sent error' });
+    }
+
+    res.json({
+      message: `Email has been sent to ${email}. Follow the instruction to reset your account.`,
+    });
+  } catch (err) {
+    console.log('Reset Error', err);
+    return res.status(400).json({ error: err });
+  }
+};
+
+// @desc    Reset Password
+// @route   PUT /api/auth/reset-password
+// @access  Private
+exports.resetPassword = async (req, res) => {};
