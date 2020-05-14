@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
 const sendgridMail = require('@sendgrid/mail');
+const _ = require('lodash');
 
 const User = require('../models/User');
+
+sendgridMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // @desc    Signing up user
 // @route   POST /api/auth/signup
@@ -16,8 +19,6 @@ exports.signup = async (req, res) => {
     if (user) {
       return res.status(400).json({ error: 'Email is taken.' });
     }
-
-    sendgridMail.setApiKey(process.env.SENDGRID_API_KEY);
 
     const token = jwt.sign(
       { name, email, password },
@@ -48,8 +49,8 @@ exports.signup = async (req, res) => {
       message: `Email has been sent to ${email}. Follow the instruction to activate your account.`,
     });
   } catch (err) {
-    console.log('Signup Error', err);
-    return res.status(400).json({ error: err });
+    console.error(err.message);
+    res.status(500).send('Server Error');
   }
 };
 
@@ -78,10 +79,8 @@ exports.accountActivation = async (req, res) => {
       message: 'Signup Success. Please Sign in.',
     });
   } catch (err) {
-    console.log('Account Activation Error', err);
-    res.status(401).json({
-      error: 'Error saving user in database. Try signup again.',
-    });
+    console.error(err.message);
+    res.status(500).send('Server Error');
   }
 };
 
@@ -128,7 +127,7 @@ exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
 
     if (!user) {
       return res.status(404).json({
@@ -148,11 +147,17 @@ exports.forgotPassword = async (req, res) => {
         <h1>Hi, we have received a request to reset your password. 
         If you did not make the request, just ignore this email. Otherwise, 
         you can reset your password using this link:</h1>
-        <p>${process.env.CLIENT_URL}/auth/password-reset/${token}</p>
+        <p>${process.env.CLIENT_URL}/auth/password/reset/${token}</p>
         <p>This email may contain sensitive information</p>
         <p>${process.env.CLIENT_URL}</p>
       `,
     };
+
+    const updatedUser = await user.updateOne({ resetPasswordLink: token });
+
+    if (!updatedUser) {
+      return res.status(400).json({ error: 'Update user error' });
+    }
 
     const sent = await sendgridMail.send(emailData);
 
@@ -164,12 +169,49 @@ exports.forgotPassword = async (req, res) => {
       message: `Email has been sent to ${email}. Follow the instruction to reset your account.`,
     });
   } catch (err) {
-    console.log('Reset Error', err);
-    return res.status(400).json({ error: err });
+    console.error(err.message);
+    res.status(500).send('Server Error');
   }
 };
 
 // @desc    Reset Password
 // @route   PUT /api/auth/reset-password
 // @access  Private
-exports.resetPassword = async (req, res) => {};
+exports.resetPassword = async (req, res) => {
+  const { resetPasswordLink, newPassword } = req.body;
+
+  try {
+    if (!resetPasswordLink) {
+      return res.status(400).json({ error: 'Expired link. Try again.' });
+    }
+
+    const decoded = jwt.verify(
+      resetPasswordLink,
+      process.env.JWT_RESET_PASSWORD
+    );
+
+    let user = await User.findOne({ resetPasswordLink });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ error: 'Something went wrong. Try later.' });
+    }
+
+    const updatedFields = {
+      password: newPassword,
+      resetPasswordLink: '',
+    };
+
+    user = _.extend(user, updatedFields);
+
+    await user.save();
+
+    res.json({
+      message: 'Great! Now you can login with your new password.',
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+};
