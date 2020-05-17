@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -22,6 +22,7 @@ const SignUp = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setFormData({ ...formData, buttonText: 'Submitting' });
 
     const data = JSON.stringify({ name, email, password });
 
@@ -103,6 +104,13 @@ const SignUp = () => {
       {isAuth() ? <Redirect to='/dashboard' /> : null}
       <h1 className='p-5 text-center'>SignUp</h1>
       {signupForm()}
+      <br />
+      <Link
+        to='/auth/password/forgot'
+        className='btn btn-sm btn-outline-danger'
+      >
+        Forgot Password
+      </Link>
     </div>
   );
 };
