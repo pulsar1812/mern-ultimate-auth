@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const sendgridMail = require('@sendgrid/mail');
 const _ = require('lodash');
+const { OAuth2Client } = require('google-auth-library');
 
 const User = require('../models/User');
 
@@ -219,3 +220,9 @@ exports.resetPassword = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
+// @desc    Google Login
+// @route   POST /api/auth/google-login
+// @access  Public
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+exports.googleLogin = async (req, res) => {};
