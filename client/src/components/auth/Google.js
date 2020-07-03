@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import { authenticate, isAuth } from './helpers';
 
-const Google = () => {
+const Google = ({ informParent }) => {
   const responseGoogle = async (response) => {
     console.log(response.tokenId);
     try {
@@ -14,6 +14,7 @@ const Google = () => {
       );
 
       console.log('Google Signin Success', res);
+      informParent(res);
     } catch (err) {
       console.log('Google Signin Error', err.response);
     }

@@ -20,6 +20,14 @@ const SignIn = ({ history }) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
 
+  const informParent = (res) => {
+    authenticate(res, () => {
+      isAuth() && isAuth().role === 'admin'
+        ? history.push('/admin')
+        : history.push('/dashboard');
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setFormData({ ...formData, buttonText: 'Submitting' });
@@ -97,7 +105,7 @@ const SignIn = ({ history }) => {
       <ToastContainer />
       {isAuth() ? <Redirect to='/dashboard' /> : null}
       <h1 className='p-5 text-center'>SignIn</h1>
-      <Google />
+      <Google informParent={informParent} />
       {signinForm()}
       <br />
       <Link
