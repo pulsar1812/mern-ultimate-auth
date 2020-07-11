@@ -2,8 +2,6 @@ import React from 'react';
 import GoogleLogin from 'react-google-login';
 import axios from 'axios';
 
-import { authenticate, isAuth } from './helpers';
-
 const Google = ({ informParent }) => {
   const responseGoogle = async (response) => {
     console.log(response.tokenId);
@@ -28,7 +26,7 @@ const Google = ({ informParent }) => {
           <button
             onClick={renderProps.onClick}
             disabled={renderProps.disabled}
-            className='btn btn-danger btn-block'
+            className='btn btn-danger btn-lg btn-block'
           >
             <i className='fab fa-google pr-2'></i> Login with Google
           </button>

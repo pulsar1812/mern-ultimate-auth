@@ -3,7 +3,8 @@ const expressJwt = require('express-jwt');
 const User = require('../models/User');
 
 exports.requireSignin = expressJwt({
-  secret: process.env.JWT_SECRET,
+  secret: process.env.JWT_SECRET, //By default, the decoded token is attached to req.user
+  algorithms: ['RS256'],
 });
 
 exports.adminMiddleware = async (req, res, next) => {
